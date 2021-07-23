@@ -1,7 +1,11 @@
+using DatingAppAPI.Data;
+using DatingAppAPI.Models.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,6 +32,20 @@ namespace DatingAppAPI
         {
 
             services.AddControllers();
+
+            // DataBase
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("constr"));
+            });
+
+            // Identity
+            services.AddIdentity<AppUser, AppRole>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.User.RequireUniqueEmail = true;
+            }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DatingAppAPI", Version = "v1" });
